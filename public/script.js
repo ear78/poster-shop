@@ -2,14 +2,13 @@ new Vue({
 	el: "#app",
 	data: {
 		total: 0,
-		products: [
-			{id: 1, title: "Item 1", price: 8.99},
-			{id: 2, title: "Item 2", price: 9.99},
-			{id: 3, title: "Item 3", price: 10.99}
-		],
+		products: [],
 		cart: [
 
-		]
+		],
+		search: "",
+		lastSearch: "",
+		loading: false
 	},
 	methods: {
 		addToCart: function (product) {
@@ -31,6 +30,37 @@ new Vue({
 					qty: 1
 				});
 			}
+		},
+		inc: function(item){
+			item.qty++;
+			this.total+= item.price;
+		},
+		dec: function(item){
+			item.qty--;
+			this.total-= item.price;
+			if(item.qty <= 0){
+				var i = this.cart.indexOf(item);
+				this.cart.splice(i, 1);
+			}
+		},
+		onSubmit: function(){
+			this.products = [];
+			this.loading = true;
+			var path = "/search?q=".concat(this.search);
+
+			this.$http.get(path)
+				.then(function(response){
+					setTimeout(function(){
+						this.products = response.body;
+						this.lastSearch = this.search;
+						this.loading = false;
+					} .bind(this), 3000);
+				});
+		}
+	},
+	filters: {
+		currency: function(price){
+			return "$".concat(price.toFixed(2));
 		}
 	}
 });

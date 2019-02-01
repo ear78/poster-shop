@@ -18,14 +18,26 @@
                 <img src="public/logo.png">
                 <h1>Vue.js Poster Shop</h1>
             </div>
+			<form action="" class="search-bar" v-on:submit.prevent="onSubmit">
+				<input type="text" placeholder="Search for Posters" required v-model="search">
+				<input type="submit" value="Search" class="btn">
+			</form>
+			<p>Try search terms <em>cat, dog, flower</em></p>
         </div>
     </div>
     <div class="main container">
         <div class="products">
+			<div v-if="loading">Loading...</div>
+			<div class="search-results" v-else>
+				Found {{ products.length }} results for search term <em>{{ lastSearch }}</em>
+			</div>
 			<div class="product" v-for="product in products" v-bind:key="product.id">
-				<h4 class="product-title">{{ product.title }}</h4>
-				<div class="price">{{ product.price }}</div>
-				<button class="add-to-cart btn" v-on:click="addToCart(product)">Add to Cart</button>
+				<div class="product-image"><img v-bind:src="product.thumb" v-bind:alt="product.title" /></div>
+				<div>
+					<h4 class="product-title">{{ product.title }}</h4>
+					<div class="product-price"><strong>{{ product.price | currency }}</strong></div>
+					<button class="add-to-cart btn" v-on:click="addToCart(product)">Add to Cart</button>
+				</div>
 			</div>
         </div>
         <div class="cart">
@@ -33,11 +45,13 @@
 			<ul>
 				<li v-for="item in cart" v-bind:key="item.id" class="cart-item">
 					<div class="item-title">{{ item.title }}</div>
-					<span class="item-qty">{{ item.price}} x {{ item.qty }}</span>
+					<span class="item-qty">{{ item.price | currency }} x {{ item.qty }}</span>
+					<button v-on:click="inc(item)" class="btn">+</button>
+					<button v-on:click="dec(item)" class="btn">-</button>
 				</li>
 			</ul>
             <div v-if="cart.length">
-                <div class="cart-total">Total: ${{ total }}</div>
+                <div class="cart-total">Total: {{ total | currency }}</div>
             </div>
 			<div v-else>
 				<div class="empty-cart">No items in the cart</div>
@@ -48,7 +62,8 @@
 
 <!-- Scripts -->
 <script src="/reload/reload.js"></script>
-<script src="./node_modules/vue/dist/vue.js"></script>
+<script type="text/javascript" src="./node_modules/vue/dist/vue.js"></script>
+<script type="text/javascript" src="./node_modules/vue-resource/dist/vue-resource.js"></script>
 <script type="text/javascript" src="public/script.js"></script>
 
 </body>
